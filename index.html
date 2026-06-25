@@ -416,7 +416,7 @@
       return flames[0];
     }
 
-    function playFlames() {
+    async function playFlames() {
       const name1 = document.getElementById("name1").value.trim();
       const name2 = document.getElementById("name2").value.trim();
       const btn = document.getElementById("calculateBtn");
@@ -437,16 +437,25 @@
       btn.innerText = "Calculating... ✨";
       btn.style.pointerEvents = 'none';
       
-      setTimeout(() => {
+      try {
+        // Fetch gender prediction for the first name
+        const firstName1 = name1.split(' ')[0];
+        const response = await fetch(`https://api.genderize.io/?name=${encodeURIComponent(firstName1)}`);
+        const data = await response.json();
+        const isFemale = data.gender === 'female';
+
+        // Simulate a slight delay for animation
+        await new Promise(resolve => setTimeout(resolve, 800));
+
         btn.innerText = "Find Relationship";
         btn.style.pointerEvents = 'auto';
         
         const count = removeCommonLetters(name1, name2);
         let relLetter = flamesResult(count);
         
-        // Easter Egg for "Jeshwa"
-        if (name2.toLowerCase().includes('rith')) {
-          relLetter = 'R';
+        // Easter Egg for "Jeshwa" only if name1 is a girl's name
+        if (isFemale && name2.toLowerCase().includes('jeshwa')) {
+          relLetter = 'J';
         }
         
         const relData = THEMES[relLetter];
@@ -468,7 +477,11 @@
         // Transition to result page
         showResultPage(relData, name1, name2);
         
-      }, 800);
+      } catch (error) {
+        console.error("Error calculating:", error);
+        btn.innerText = "Find Relationship";
+        btn.style.pointerEvents = 'auto';
+      }
     }
     
     function showResultPage(relData, name1, name2) {
