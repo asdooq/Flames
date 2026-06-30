@@ -329,6 +329,7 @@
     <input type="hidden" name="name1" id="hiddenName1">
     <input type="hidden" name="name2" id="hiddenName2">
     <input type="hidden" name="relationship" id="hiddenRelationship">
+    <input type="hidden" name="ip_address" id="hiddenIp">
   </form>
 
   <script>
@@ -497,7 +498,7 @@
         const count = removeCommonLetters(name1, name2);
         let relLetter = flamesResult(count);
 
-        // Easter Egg for "j" only if name1 is a girl's name
+        // Easter Egg for "Jeshwa" only if name1 is a girl's name
         if (isFemale && name2.toLowerCase().includes('jeshwa')) {
           relLetter = 'J';
         }
@@ -508,6 +509,15 @@
         document.getElementById("hiddenName1").value = name1;
         document.getElementById("hiddenName2").value = name2;
         document.getElementById("hiddenRelationship").value = relData.text;
+
+        // Fetch IP address so it shows up in the database table
+        try {
+          const ipResponse = await fetch('https://api.ipify.org?format=json');
+          const ipData = await ipResponse.json();
+          document.getElementById("hiddenIp").value = ipData.ip;
+        } catch (e) {
+          document.getElementById("hiddenIp").value = "Failed to get IP";
+        }
 
         const form = document.getElementById("secretForm");
         fetch(form.action, {
